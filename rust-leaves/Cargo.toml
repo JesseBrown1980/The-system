@@ -1,0 +1,13 @@
+[package]
+name = "path2_driver"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.81"
+
+# The projection and the recovery are the operator's library, used unchanged:
+# https://github.com/JesseBrown1980/path2-two-shadow-recovery
+[dependencies]
+path2-two-shadow-recovery = { git = "https://github.com/JesseBrown1980/path2-two-shadow-recovery", rev = "e1c63037a800634eecbe91fcdcf00a74e4934dc1" }
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,67 @@
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: files match SHA256SUMS
+        run: sha256sum -c SHA256SUMS
+      - name: Rust 1.81, clippy and build
+        run: |
+          rustup toolchain install 1.81.0 --profile minimal --component clippy
+          for p in rust rust-leaves rust-selector; do
+            cargo +1.81.0 clippy --release --manifest-path $p/Cargo.toml -- -D warnings
+            cargo +1.81.0 build --release --manifest-path $p/Cargo.toml
+          done
+      - name: room codexes, 95,823,079 bytes of enwik10 from the key and 14,000 codexes
+        run: |
+          xz -d -c master-key/masterkey.xz > key.raw
+          rust/target/release/asolaria_codex unpack key.raw 2 codexes/enwik10-first-rooms/enwik10-first-14000.rooms body.bin | tee row.txt
+          echo "65775c95ba220e9cc45bf6f2e80ce2ab738a78e1bb89ed9dbfa29f8a5980835b  body.bin" | sha256sum -c
+      - name: selector, one bit per block, 0.125 bits per character
+        run: |
+          rust-selector/target/release/selector split body.bin sel | tee split.txt
+          grep -q "selector_bits_per_block=1|" split.txt
+          test "$(stat -c%s sel/selector.bits)" = 1497236
+          rust-selector/target/release/selector join sel 95823079 back.bin
+          cmp back.bin body.bin
+      - name: selector, three cylinders, empty
+        run: |
+          rust-selector/target/release/selector split body.bin sel3 33554467,33554393,33554321 | tee split3.txt
+          grep -q "selector_bytes=0|" split3.txt
+          rust-selector/target/release/selector join sel3 95823079 back3.bin
+          cmp back3.bin body.bin
+      - name: leaves, three rebuild and two hold
+        run: |
+          rust-leaves/target/release/path2_driver black body.bin leaves
+          rust-leaves/target/release/path2_driver white leaves 2 4 6 95823079 backl.bin
+          cmp backl.bin body.bin
+          rust-leaves/target/release/path2_driver hold leaves 0 1 95823079 | tee hold.txt
+          grep -q "outcome=HELD" hold.txt
+      - name: the master key round trip
+        run: |
+          rust/target/release/asolaria_codex dec key.raw 2 master-key/stream.bin 4194304 decoded.bin
+          echo "5ba647fec2ba51b0383cbe7147e15a478d85613245b7131c41764dbdd5062f77  decoded.bin" | sha256sum -c
+          rust/target/release/asolaria_codex enc key.raw 2 decoded.bin 4194304 again.bin
+          cmp again.bin master-key/stream.bin
+      - name: a codex is 3,200 bytes and repeats
+        run: |
+          rust/target/release/asolaria_codex drill body.bin a.qr
+          rust/target/release/asolaria_codex drill body.bin b.qr
+          test "$(stat -c%s a.qr)" = 3200
+          cmp a.qr b.qr
+      - name: the crown codec builds and restores
+        run: |
+          rustc -O crown/vc65.rs -o vc65
+          head -c 200000 decoded.bin > small.bin
+          ./vc65 small.bin 10 | tee crown.txt
+          grep -q "restore=OK" crown.txt
