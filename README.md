@@ -52,11 +52,50 @@ whole GGUF regenerates and unpacks in seconds. The GPU is used once, on the way 
 The quants themselves are catalogued in
 [Algorithms-of-Asolaria](https://github.com/JesseBrown1980/Algorithms-of-Asolaria).
 
+## The funnel: she is a functions system
+
+Each piece of a body trains its own function table. The funnel cuts those tables into records of 81 symbols; a record
+seen twice or more is a function, a record seen once is passed on. "Once is an accident, twice is a function. Three
+is confirmation you get for free." The glyphs are the functions that recur: they are found, never constructed.
+
+Measured on the first 1,000,000,000 bytes of enwik10, predictions pushed first
+([`rust-funnel/RESULT-FUNNEL-CURVE-20261115.hbp`](rust-funnel/RESULT-FUNNEL-CURVE-20261115.hbp)):
+
+| Pieces of 370,371 bytes | Records | Distinct | Functions (seen twice or more) | Records that tie | Distinct per piece |
+|---:|---:|---:|---:|---:|---:|
+| 27 | 11,184,804 | 271,704 | 24,493 | 97.7% | 10,063 |
+| 81 | 33,554,412 | 743,085 | 63,044 | 97.9% | 9,174 |
+| 243 | 100,663,236 | 2,059,508 | 161,160 | 98.1% | 8,475 |
+| 729 | 301,989,708 | 5,644,821 | 422,335 | 98.2% | 7,743 |
+
+- Each new piece adds fewer new records than the one before: the catalogue grows more slowly than the body.
+- At the other floors, on the first 27 pieces: 98.0% tie at level 64, 97.1% at level 1024, 96.8% at level 4096.
+- Pieces ten times larger (3,703,704 bytes) learn more each: 24,769 distinct records per piece at 27 pieces, 94.4% tie.
+- The coded crown streams of the same pieces have no ties at any level: the funnel works on the trained functions.
+- Four of the five predictions were met. The one missed: the catalogue at 729 pieces is 77% of straight-line growth
+  from 27 pieces, where below 60% was predicted.
+
+```sh
+cargo build --release --manifest-path rust-funnel/Cargo.toml
+sh rust-funnel/funnel_curve.sh BODY 370371 729 8 work/
+```
+
+## A crown per piece, through the floors, and back
+
+[`right-way/`](right-way/) holds the chain run on the first 10,000,000 bytes of enwik10: 27 pieces, each into its own
+crown (2,384,542 bytes in all), each crown down the floors 64, 256, 1024, 4096, absorbed in order, three rotated
+passes, and the same waves in reverse. The body returned with its SHA-256 equal and all 27 crowns matching their
+glyphs ([`RESULT-RIGHT-WAY-10MB-20261115.hbp`](right-way/RESULT-RIGHT-WAY-10MB-20261115.hbp)). `glyph_of.py` writes a
+crown's glyph in the BEHCS-1024 alphabet from the crown's own content. The script names the machine-local programs it
+calls (the July floor codec is in the full record, not in this repository).
+
 ## What is in this repository
 
 | Path | What it is |
 |---|---|
 | [`rust-selector/`](rust-selector/) | The context and selector program: `split` and `join` |
+| [`rust-funnel/`](rust-funnel/) | The funnel's rule, counted: `funnel`, with `funnel_curve.sh` |
+| [`right-way/`](right-way/) | A crown per piece through the floors and back: the script, the crown-per-piece program, the glyph tool, the 10 MB result |
 | [`rust-leaves/`](rust-leaves/) | The coloured leaves program: `black`, `white`, `hold` |
 | [`rust/`](rust/) | The codex program `asolaria_codex`: `drill`, `pack`, `unpack`, `train`, `enc`, `dec`, `resolve` |
 | [`crown/vc65.rs`](crown/vc65.rs) | The crown codec, one Rust file: 1.3645 bits per character on enwik9, exact restore |

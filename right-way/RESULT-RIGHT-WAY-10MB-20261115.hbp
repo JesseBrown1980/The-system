@@ -1,0 +1,9 @@
+RW0|body_bytes=10000000|body_sha256=0304e98b63d91fb33de572337eb46943d692245b45e4c943b06441effdb43fca|pieces=27|json=0
+RW1|stage=divided|piece_bytes=370371|pieces=27|json=0
+RW2|stage=crowns|crowns=27|crown_bytes=2384542|seconds=212|json=0
+RW3|stage=glyphs|codexes=27|codex_bytes_each=3200|distinct_handles=27|json=0
+RW4|stage=floors_64_256_1024_4096|archives=27|floor_bytes=2409922|seconds=32|json=0
+RW5|stage=kernel_absorbed|kernel_body_bytes=2409922|index_bytes=567|json=0
+RW6|stage=three_passes_normal_anti_antianti|bytes_each=1204964|three_bytes=3614892|selector_bytes=0|json=0
+RWBACK|body_bytes=10000000|body_sha256=0304e98b63d91fb33de572337eb46943d692245b45e4c943b06441effdb43fca|equals_body=1|glyphs_matching=27|seconds=235|json=0
+RWSUM|body_bytes=10000000|crown_bytes=2384542|crown_bits_per_character_x1000=1907|floor_bytes=2409922|three_passes_bytes=3614892|glyph_codex_bytes=86400|handle_bytes=216|forward_seconds=252|json=0

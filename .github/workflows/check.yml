@@ -18,7 +18,7 @@ jobs:
       - name: Rust 1.81, clippy and build
         run: |
           rustup toolchain install 1.81.0 --profile minimal --component clippy
-          for p in rust rust-leaves rust-selector; do
+          for p in rust rust-leaves rust-selector rust-funnel; do
             cargo +1.81.0 clippy --release --manifest-path $p/Cargo.toml -- -D warnings
             cargo +1.81.0 build --release --manifest-path $p/Cargo.toml
           done
@@ -65,3 +65,11 @@ jobs:
           head -c 200000 decoded.bin > small.bin
           ./vc65 small.bin 10 | tee crown.txt
           grep -q "restore=OK" crown.txt
+      - name: the funnel rule on three function tables
+        run: |
+          for i in 0 1 2; do
+            dd if=body.bin of=piece.bin bs=370371 skip=$i count=1 status=none
+            rust/target/release/asolaria_codex train table.fn 2 piece.bin > /dev/null
+            cat table.fn
+          done | rust-funnel/target/release/funnel 8 33554432 | tee funnel.txt
+          grep -q "bodies=3|bytes=100663296|records=1242756|distinct=35818|functions_seen_twice_or_more=3333|" funnel.txt
