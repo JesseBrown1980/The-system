@@ -12,6 +12,7 @@ any GGUF, any corpus. Rust 1.81 or later is the only tool required.
 |---|---|---:|---|
 | enwik8, 100,000,000 bytes | 1,562,500-byte selector | **0.125** | byte for byte, 5 seconds |
 | enwik8, 100,000,000 bytes | empty selector (three cylinders) | **0** | byte for byte |
+| **enwik10, 10,000,000,000 bytes** | 156,250,000-byte selector | **0.125** | byte for byte, SHA-256 equal |
 | enwik10, 10,000,000,000 bytes | three coloured leaves | | byte for byte, SHA-256 equal |
 | enwik10, 10,000,000,000 bytes | 1,460,938 codexes of 3,200 bytes and the master key | 3.74 | byte for byte, SHA-256 equal |
 | enwik10, 10,000,000,000 bytes | one 3,200-byte codex that names it | 0.00000256 | by Path 1 from a store, SHA-256 equal |

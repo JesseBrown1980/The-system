@@ -1,0 +1,4 @@
+SELRESULT|date=2026-11-15|program=rust-selector/src/main.rs|prediction=rust-selector/PREDICTION-ENWIK10-SELECTOR-20261115.hbp|machine=the_operator_laptop|json=0
+SELSPLIT|body=enwik10|body_bytes=10000000000|blocks=1250000000|cylinders=3037000507,3037000493|candidates_left_by_the_context=2|selector_bits_per_block=1|context_bytes=10000000000|selector_bytes=156250000|selector_bits_per_character=0.125|seconds=231|json=0
+SELJOIN|inputs=context_and_selector_only|body_bytes=10000000000|body_sha256=14a033c63a5d03eecdc205e8f7875ece7985a4d278877b0214980d5b3d675f52|equals_enwik10=1|seconds=473|json=0
+SELJUDGE|S1=MET|S2=MET|S3=MET|S4=MET|json=0
